@@ -1,91 +1,292 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>POOP SCOOP｜排便管理</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>LunaCare 排便管理システム Ver.0.2</title>
+<style>
+:root{
+  --mint:#5fd3c2; --mint2:#dff8f3; --blue:#74c8f4; --blue2:#e7f6ff;
+  --navy:#16345f; --ink:#20324c; --muted:#7b8aa0; --line:#dce7ef;
+  --bg:#f7fbfd; --white:#fff; --warn:#ffbf69; --danger:#ff7d8b; --ok:#48c78e;
+  --shadow:0 8px 24px rgba(42,88,120,.09); --r:18px;
+}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Yu Gothic",sans-serif;color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:1400px;margin:auto;min-height:100vh;padding-bottom:84px}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:14px 18px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;color:#148f88;font-size:22px}.brand-badge{width:38px;height:38px;border-radius:14px;background:linear-gradient(135deg,var(--mint2),var(--blue2));display:grid;place-items:center}
+.top-actions{display:flex;gap:8px}.pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;color:var(--navy)}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:12px 16px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:67px;z-index:15}
+.tab{border:0;background:transparent;border-radius:14px;padding:11px 8px;color:var(--muted);font-weight:700}.tab.active{background:var(--mint2);color:#138d85}
+.view{display:none;padding:18px}.view.active{display:block}
+.grid{display:grid;gap:16px}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+.card h2,.card h3{margin:0 0 12px;color:var(--navy)}
+.stat{padding:18px;border-radius:18px;background:linear-gradient(135deg,#fff,var(--mint2));border:1px solid #cdeee8}.stat b{font-size:34px;color:#109b90}.stat.warn{background:linear-gradient(135deg,#fff,#fff3e7)}.stat.warn b{color:#f59b2f}.stat.danger{background:linear-gradient(135deg,#fff,#ffecef)}.stat.danger b{color:#ef6676}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.muted{color:var(--muted)}.small{font-size:13px}
+.btn{border:0;border-radius:14px;padding:11px 16px;font-weight:800}.btn.primary{background:linear-gradient(135deg,var(--mint),#41b8d8);color:#fff}.btn.soft{background:var(--blue2);color:#16749d}.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--navy)}.btn.danger{background:#ffecef;color:#d94b5d}
+.list{display:grid;gap:10px}.person{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:13px 14px;background:#fff}.person strong{color:var(--navy)}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;background:#eef6f8}.badge.ok{background:#e5f8ee;color:#168c5b}.badge.warn{background:#fff2df;color:#c67600}.badge.danger{background:#ffe9ed;color:#d84d60}
+.progress{height:10px;background:#edf3f6;border-radius:999px;overflow:hidden}.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),var(--blue));border-radius:999px}
+label{font-weight:700;color:var(--navy);display:block;margin:8px 0 6px}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff;color:var(--ink)}
+textarea{min-height:84px;resize:vertical}
+.seg{display:flex;gap:8px;flex-wrap:wrap}.seg button{flex:1;min-width:88px;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px;font-weight:800;color:var(--navy)}.seg button.on{background:var(--mint);color:#fff;border-color:transparent}
+.subtabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.subtab{white-space:nowrap;border:1px solid var(--line);border-radius:999px;background:#fff;padding:8px 13px;font-weight:800;color:var(--navy)}.subtab.on{background:var(--blue2);color:#11749d;border-color:#bfe6fb}
+.stools{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.stool{border:1px solid var(--line);background:#fff;border-radius:16px;padding:10px 4px;text-align:center}.stool .ico{font-size:26px}.stool small{display:block;color:var(--muted);margin-top:4px}.stool.on{outline:3px solid #66cfc3;background:var(--mint2)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.cal-head{text-align:center;font-weight:800;color:var(--muted);padding:6px}.day{min-height:112px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:8px;overflow:hidden}.day.other{opacity:.35}.day.today{outline:2px solid var(--mint)}.date{font-weight:800;color:var(--navy);margin-bottom:6px}.ev{display:flex;align-items:center;gap:5px;font-size:11px;padding:3px 5px;border-radius:8px;margin:2px 0;background:#f1f8fb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dotnum{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:900;color:#fff;flex:0 0 20px}.b1,.b2{background:#f0a24b}.b3,.b4{background:#45bfa8}.b5,.b6{background:#68bff0}.b7{background:#5b8ee6}.none{background:#c9d0d7}
+.chart{height:180px;display:flex;align-items:flex-end;gap:8px;padding:14px 8px 26px;border-bottom:1px solid var(--line);position:relative}.bar{flex:1;background:linear-gradient(180deg,var(--blue),var(--mint));border-radius:8px 8px 0 0;min-width:8px;position:relative}.bar span{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--muted)}
+.linechart{width:100%;height:200px}.donut{width:150px;height:150px;border-radius:50%;background:conic-gradient(#f0a24b 0 20%,#45bfa8 20% 62%,#68bff0 62% 88%,#5b8ee6 88% 100%);display:grid;place-items:center}.donut:after{content:"便状態";width:88px;height:88px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:800;color:var(--navy)}
+.help-step{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line)}.stepno{width:34px;height:34px;border-radius:12px;background:var(--mint2);display:grid;place-items:center;color:#118f86;font-weight:900}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);max-width:1400px;margin:auto}.bottom button{border:0;background:transparent;padding:10px 4px 12px;color:var(--muted);font-weight:700}.bottom button.on{color:#11968d}.bottom span{display:block;font-size:21px;margin-bottom:2px}
+.modal{position:fixed;inset:0;background:rgba(21,52,75,.32);display:none;align-items:flex-end;justify-content:center;z-index:99}.modal.on{display:flex}.sheet{width:min(720px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:20px;box-shadow:0 -10px 30px rgba(0,0,0,.15)}
+.toast{position:fixed;left:50%;bottom:95px;transform:translateX(-50%);background:#15385d;color:#fff;padding:10px 16px;border-radius:999px;display:none;z-index:120}.toast.on{display:block}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+@media(max-width:900px){.g4,.g2,.two,.three{grid-template-columns:1fr}.stools{grid-template-columns:repeat(4,1fr)}.tabs{display:none}.view{padding:12px}.day{min-height:92px;padding:6px}.ev{font-size:10px}.topbar{padding:12px}.brand{font-size:19px}.top-actions .pill:first-child{display:none}}
+</style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand-wrap">
-      <div class="logo">PS</div>
-      <div><h1>POOP SCOOP</h1><p>排便管理システム 試作版</p></div>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brand-badge">🫧</div><div>LunaCare<br><span class="small muted">排便・お薬をやさしく管理</span></div></div>
+  <div class="top-actions"><button class="pill" onclick="openHelp()">❔ 使い方</button><button class="pill">👤 スタッフ</button></div>
+</header>
+<nav class="tabs">
+  <button class="tab active" data-view="home">🏠 ホーム</button>
+  <button class="tab" data-view="record">✏️ 記録</button>
+  <button class="tab" data-view="calendar">🗓️ 排便カレンダー</button>
+  <button class="tab" data-view="analysis">📊 分析</button>
+  <button class="tab" data-view="menu">☰ メニュー</button>
+</nav>
+
+<section id="home" class="view active">
+  <div class="row between"><div><h1 style="margin:0;color:var(--navy)">今日の排便管理</h1><div class="muted" id="todayLabel"></div></div><button class="btn primary" onclick="go('record')">＋ 記録する</button></div>
+  <div class="grid g4" style="margin-top:16px">
+    <div class="stat"><div>利用者</div><b id="sUsers">0</b><span>名</span></div>
+    <div class="stat"><div>本日 排便あり</div><b id="sToday">0</b><span>名</span></div>
+    <div class="stat warn"><div>3日以上なし</div><b id="sWarn">0</b><span>名</span></div>
+    <div class="stat danger"><div>下剤後24時間以上</div><b id="sMed">0</b><span>名</span></div>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card"><div class="row between"><h2>要確認の方</h2><button class="btn ghost" onclick="go('calendar')">カレンダーへ</button></div><div id="alertList" class="list"></div></div>
+    <div class="card"><h2>本日の入力進捗</h2><div class="row between"><span id="progText">0 / 0人</span><span class="muted">未入力も確認できます</span></div><div class="progress" style="margin:10px 0 16px"><i id="progBar" style="width:0%"></i></div><div id="unrecorded" class="list"></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="row between"><div><h2>使い方ガイド</h2><div class="muted">初めて使う職員さん向けのかんたん説明</div></div><button class="btn soft" onclick="openHelp()">ガイドを見る</button></div></div>
+</section>
+
+<section id="record" class="view">
+  <div class="row between"><div><h1 style="margin:0;color:var(--navy)">デイリー入力</h1><div class="muted" id="recordDateLabel"></div></div><div class="badge" id="recordProgress"></div></div>
+  <div class="card" style="margin-top:14px;max-width:900px;margin-left:auto;margin-right:auto">
+    <label>利用者を選択</label><select id="personSelect"></select>
+    <div class="subtabs" style="margin:14px 0"><button class="subtab on" data-sub="bowel">排便</button><button class="subtab" data-sub="med">お薬</button><button class="subtab" data-sub="memo">メモ</button></div>
+    <div id="sub-bowel">
+      <label>排便の有無</label><div class="seg"><button id="yesBtn" class="on" onclick="setBowel(true)">あり</button><button id="noBtn" onclick="setBowel(false)">なし</button></div>
+      <div id="bowelDetails">
+        <div class="two"><div><label>排便時刻</label><input type="time" id="bowelTime" value="07:30"></div><div><label>便の量</label><select id="amount"><option>少量</option><option selected>普通</option><option>多量</option></select></div></div>
+        <label>便の状態を選択 <span class="small muted">（選ぶと自動で1〜7評価になります）</span></label>
+        <div class="stools" id="stools"></div>
+        <div class="row" style="margin-top:10px"><span class="badge" id="bristolBadge">評価：4</span><span class="small muted">カレンダー・CSV・分析にはこの数値が反映されます</span></div>
+        <label>ケア・処置</label><div class="seg" id="careSeg"><button class="on">なし</button><button>浣腸</button><button>摘便</button><button>その他</button></div>
+      </div>
     </div>
-    <div class="top-actions">
-      <button class="ghost" id="helpBtn">？ 使い方</button>
-      <button class="primary" data-open-record>＋ 記録する</button>
+    <div id="sub-med" style="display:none">
+      <label>お薬の使用</label><div class="seg"><button id="medYes" class="on" onclick="setMed(true)">あり</button><button id="medNo" onclick="setMed(false)">なし</button></div>
+      <div id="medDetails">
+        <label>薬剤カテゴリー</label><div class="subtabs" id="medCats"></div>
+        <label>薬剤名</label><input id="medName" list="medList" placeholder="例）酸化マグネシウム"><datalist id="medList"><option>酸化マグネシウム</option><option>モビコール</option><option>センノシド</option><option>ピコスルファート</option><option>ラキソベロン</option></datalist>
+        <div class="two"><div><label>投与方法</label><select id="route"><option>内服</option><option>坐薬</option><option>浣腸</option><option>貼付</option><option>その他</option></select></div><div><label>投与時刻</label><input type="time" id="medTime" value="20:00"></div></div>
+        <label>投与量</label><input id="dose" placeholder="例）1錠、10mL など">
+        <label>投与理由</label><input id="medReason" placeholder="例）排便が3日ないため">
+      </div>
     </div>
-  </header>
+    <div id="sub-memo" style="display:none"><label>メモ</label><textarea id="memo" placeholder="申し送りや気になることを入力"></textarea></div>
+    <hr>
+    <div class="row between"><button class="btn ghost" onclick="saveRecord(false)">保存して終了</button><button class="btn primary" onclick="saveRecord(true)">保存して次の利用者へ →</button></div>
+  </div>
+</section>
 
-  <nav class="tabs">
-    <button class="tab active" data-tab="home">ホーム</button>
-    <button class="tab" data-tab="users">利用者</button>
-    <button class="tab" data-tab="analysis">統計・分析</button>
-    <button class="tab" data-tab="csv">CSV管理</button>
-    <button class="tab" data-tab="settings">設定</button>
-  </nav>
+<section id="calendar" class="view">
+  <div class="row between"><div><h1 style="margin:0;color:var(--navy)">排便カレンダー</h1><div class="muted">全体・個別の排便状況を月単位で確認</div></div><button class="btn ghost" onclick="openHelp('calendar')">？ この画面の使い方</button></div>
+  <div class="card" style="margin-top:14px">
+    <div class="row between">
+      <div class="row"><button class="btn ghost" onclick="moveMonth(-1)">←</button><h2 id="monthLabel" style="margin:0"></h2><button class="btn ghost" onclick="moveMonth(1)">→</button></div>
+      <div class="row"><select id="calMode" onchange="renderCalendar()" style="width:auto"><option value="all">全体表示</option><option value="single">個別表示</option></select><select id="calPerson" onchange="renderCalendar()" style="width:auto"></select></div>
+    </div>
+    <div class="row small muted" style="margin:12px 0"><span><i class="dotnum b1" style="display:inline-grid">1</i> 硬め</span><span><i class="dotnum b4" style="display:inline-grid">4</i> 普通</span><span><i class="dotnum b6" style="display:inline-grid">6</i> 軟らかめ</span><span>💊 下剤使用</span><span>－ 排便なし</span></div>
+    <div class="calendar" id="calendarGrid"></div>
+  </div>
+  <div class="card" style="margin-top:14px"><h2 id="dayDetailTitle">日付を選ぶと詳細を表示</h2><div id="dayDetail" class="list muted">カレンダーの日付をタップしてください。</div></div>
+</section>
 
-  <main>
-    <section id="home" class="view active">
-      <div class="hero">
-        <div><span class="eyebrow">TODAY'S CARE</span><h2>今日の排便状況を、ひと目で。</h2><p>色付きカードで「確認したい人」をすぐ見つけられます。</p></div>
-        <div class="ice-bubbles"><span></span><span></span><span></span></div>
-      </div>
+<section id="analysis" class="view">
+  <div class="row between"><div><h1 style="margin:0;color:var(--navy)">統計・分析</h1><div class="muted">排便傾向をグラフで見える化</div></div><div class="row"><select id="analysisPerson" onchange="renderAnalysis()" style="width:auto"></select><select id="analysisRange" onchange="renderAnalysis()" style="width:auto"><option value="30">過去30日</option><option value="60">過去60日</option><option value="90">過去90日</option></select></div></div>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card"><h3>排便回数</h3><div class="chart" id="countChart"></div></div>
+    <div class="card"><h3>Bristol 1〜7 分布</h3><div class="row" style="align-items:center"><div class="donut"></div><div id="bristolStats"></div></div></div>
+    <div class="card"><h3>排便間隔の推移</h3><svg class="linechart" id="intervalChart" viewBox="0 0 500 200"></svg></div>
+    <div class="card"><h3>この利用者の傾向</h3><div id="trendText" class="list"></div></div>
+  </div>
+</section>
 
-      <div class="summary-grid" id="summaryGrid"></div>
+<section id="menu" class="view">
+  <h1 style="margin-top:0;color:var(--navy)">メニュー</h1>
+  <div class="grid g2">
+    <div class="card"><h2>CSV管理</h2><div class="muted">期間・対象者・内容を選んで出力できます。</div><label>期間</label><select id="csvPreset" onchange="setCsvPreset()"><option value="today">今日</option><option value="month" selected>今月</option><option value="prev">先月</option><option value="custom">期間指定</option></select><div class="two"><div><label>開始日</label><input type="date" id="csvFrom"></div><div><label>終了日</label><input type="date" id="csvTo"></div></div><label>対象者</label><select id="csvPerson"><option value="all">全利用者</option></select><label>出力内容</label><select id="csvType"><option value="combined">排便＋お薬（Excel管理表用）</option><option value="bowel">排便記録のみ</option><option value="med">お薬記録のみ</option><option value="users">利用者マスタ</option></select><div class="row" style="margin-top:12px"><button class="btn primary" onclick="exportCsv()">CSV出力</button><label class="btn soft" style="margin:0">CSV取込<input id="csvImport" type="file" accept=".csv" style="display:none" onchange="importCsv(event)"></label></div><div id="csvCount" class="small muted" style="margin-top:10px"></div></div>
+    <div class="card"><h2>利用者マスタ</h2><div id="userMaster" class="list"></div><hr><div class="three"><input id="newId" placeholder="利用者ID"><input id="newName" placeholder="氏名"><input id="newGroup" placeholder="フロア等"></div><button class="btn primary" style="margin-top:10px" onclick="addUser()">＋ 利用者追加</button></div>
+    <div class="card"><h2>判定設定</h2><label>排便なし注意（日）</label><input id="warnDays" type="number" min="1" value="3"><label>下剤後確認（時間）</label><input id="medHours" type="number" min="1" value="24"><button class="btn primary" style="margin-top:10px" onclick="saveSettings()">設定を保存</button></div>
+    <div class="card"><h2>使い方</h2><p class="muted">記録方法、カレンダーの数字、CSV出力について確認できます。</p><button class="btn soft" onclick="openHelp()">使い方ガイドを開く</button></div>
+  </div>
+</section>
 
-      <div class="section-head"><div><span class="eyebrow">CHECK FIRST</span><h3>今日の要確認</h3></div><button class="link-btn" data-tab="users">利用者一覧へ →</button></div>
-      <div id="alertList" class="alert-list"></div>
+<nav class="bottom">
+  <button class="on" data-view="home"><span>🏠</span>ホーム</button>
+  <button data-view="record"><span>✏️</span>記録</button>
+  <button data-view="calendar"><span>🗓️</span>カレンダー</button>
+  <button data-view="analysis"><span>📊</span>分析</button>
+  <button data-view="menu"><span>☰</span>メニュー</button>
+</nav>
 
-      <div class="section-head"><div><span class="eyebrow">RECENT</span><h3>最近の記録</h3></div></div>
-      <div class="table-card"><div class="table-scroll"><table><thead><tr><th>利用者</th><th>日時</th><th>排便</th><th>量</th><th>Bristol</th><th>下剤</th><th>メモ</th></tr></thead><tbody id="recentBody"></tbody></table></div></div>
-    </section>
+<div class="modal" id="helpModal"><div class="sheet"><div class="row between"><h2>使い方ガイド</h2><button class="btn ghost" onclick="closeHelp()">閉じる</button></div>
+  <div class="help-step"><div class="stepno">1</div><div><b>利用者を選んで記録</b><div class="muted small">「記録」から利用者を選び、排便あり／なしを入力します。</div></div></div>
+  <div class="help-step"><div class="stepno">2</div><div><b>便の状態は見た目で選ぶだけ</b><div class="muted small">7種類の便状態から選択すると、自動でBristol 1〜7に変換されます。数字はカレンダー・CSV・分析へ反映されます。</div></div></div>
+  <div class="help-step"><div class="stepno">3</div><div><b>保存して次の利用者へ</b><div class="muted small">「保存して次の利用者へ」を押すと、利用者一覧の次の人へ自動で移動します。</div></div></div>
+  <div class="help-step"><div class="stepno">4</div><div><b>カレンダーの数字</b><div class="muted small">1〜2＝硬め、3〜4＝普通、5〜6＝軟らかめ、7＝水様。💊は下剤使用、－は排便なしです。全体／個別表示を切替できます。</div></div></div>
+  <div class="help-step"><div class="stepno">5</div><div><b>分析</b><div class="muted small">排便回数、便状態の分布、排便間隔などをグラフで確認できます。</div></div></div>
+  <div class="help-step"><div class="stepno">6</div><div><b>CSV</b><div class="muted small">期間と対象者を選び、排便・お薬・Excel管理表用のCSVを出力できます。</div></div></div>
+  <p class="small muted">※本試作版はブラウザ内保存です。実在の利用者情報を使った本番運用は、施設の情報管理ルールとセキュリティ要件を確認してから行ってください。</p>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>
+const KEY='lunacare_v02';
+const today=new Date();
+const iso=d=>{let x=new Date(d);return x.toISOString().slice(0,10)}
+const fmt=d=>new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'}).format(d);
+let state=JSON.parse(localStorage.getItem(KEY)||'null') || seed();
+let currentMonth=new Date(today.getFullYear(),today.getMonth(),1);
+let bowelYes=true, medYes=true, bristol=4, medCat='下剤', care='なし';
 
-    <section id="users" class="view">
-      <div class="section-head"><div><span class="eyebrow">RESIDENTS</span><h2>利用者一覧</h2></div><button class="primary" id="addUserBtn">＋ 利用者追加</button></div>
-      <div class="toolbar"><input id="userSearch" placeholder="氏名・ID・所属で検索"/><select id="statusFilter"><option value="all">すべて</option><option value="red">要確認</option><option value="orange">注意</option><option value="yellow">確認</option><option value="green">通常</option></select></div>
-      <div id="userCards" class="user-grid"></div>
-    </section>
+function seed(){
+  const users=[
+    {id:'U001',name:'鈴木 花子',group:'Aユニット'},
+    {id:'U002',name:'田中 太郎',group:'Aユニット'},
+    {id:'U003',name:'山田 一郎',group:'Bユニット'},
+    {id:'U004',name:'佐藤 美咲',group:'Bユニット'},
+    {id:'U005',name:'高橋 健',group:'Cユニット'}
+  ];
+  const d=(n)=>{let x=new Date(today);x.setDate(x.getDate()-n);return iso(x)}
+  return {users,settings:{warnDays:3,medHours:24},records:[
+    {id:'R1',userId:'U001',date:d(0),time:'07:35',bowel:true,bristol:4,amount:'普通',care:'なし',med:true,medCat:'下剤',medName:'酸化マグネシウム',medTime:'20:00',route:'内服',dose:'1錠',memo:''},
+    {id:'R2',userId:'U002',date:d(1),time:'08:10',bowel:true,bristol:2,amount:'少量',care:'なし',med:false,medCat:'',medName:'',medTime:'',route:'',dose:'',memo:''},
+    {id:'R3',userId:'U003',date:d(4),time:'09:00',bowel:true,bristol:6,amount:'普通',care:'なし',med:true,medCat:'下剤',medName:'センノシド',medTime:'19:30',route:'内服',dose:'1錠',memo:''},
+    {id:'R4',userId:'U004',date:d(0),time:'06:50',bowel:false,bristol:null,amount:'',care:'なし',med:true,medCat:'下剤',medName:'モビコール',medTime:'18:00',route:'内服',dose:'1包',memo:''},
+    {id:'R5',userId:'U005',date:d(3),time:'07:00',bowel:true,bristol:1,amount:'少量',care:'なし',med:false,medCat:'',medName:'',medTime:'',route:'',dose:'',memo:''},
+  ]};
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
+function toast(t){let e=document.getElementById('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1800)}
+function go(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(v).classList.add('active');document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===v));document.querySelectorAll('.bottom button').forEach(x=>x.classList.toggle('on',x.dataset.view===v));if(v==='calendar')renderCalendar();if(v==='analysis')renderAnalysis();window.scrollTo(0,0)}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.view)));
 
-    <section id="analysis" class="view">
-      <div class="section-head"><div><span class="eyebrow">INSIGHTS</span><h2>統計・分析</h2></div></div>
-      <div class="analysis-grid">
-        <div class="panel"><h3>施設全体</h3><div id="facilityStats" class="stats-list"></div></div>
-        <div class="panel"><h3>利用者別の傾向</h3><select id="analysisUser"></select><div id="personalInsights" class="insight-box"></div></div>
-      </div>
-      <div class="panel"><h3>最近の傾向候補</h3><div id="trendCards" class="trend-grid"></div><p class="note">※ 医療判断ではなく、入力データ上の傾向を表示する試作機能です。</p></div>
-    </section>
+function setup(){
+  document.getElementById('todayLabel').textContent=fmt(today);
+  document.getElementById('recordDateLabel').textContent=fmt(today);
+  const stools=[
+    [1,'🟤','コロコロ'],[2,'🪨','硬い'],[3,'🥔','やや硬'],[4,'🙂','普通'],[5,'☁️','やわらか'],[6,'🫧','泥状'],[7,'💧','水様']
+  ];
+  document.getElementById('stools').innerHTML=stools.map(([n,i,t])=>`<button class="stool ${n===4?'on':''}" onclick="pickStool(${n},this)"><div class="ico">${i}</div><b>${n}</b><small>${t}</small></button>`).join('');
+  const cats=['下剤','整腸剤','漢方薬','その他'];
+  document.getElementById('medCats').innerHTML=cats.map((c,i)=>`<button class="subtab ${i===0?'on':''}" onclick="pickCat('${c}',this)">${c}</button>`).join('');
+  document.querySelectorAll('.subtab[data-sub]').forEach(b=>b.addEventListener('click',()=>switchSub(b.dataset.sub,b)));
+  document.querySelectorAll('#careSeg button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#careSeg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');care=b.textContent}));
+  setCsvPreset();
+  renderAll();
+}
+function switchSub(s,b){document.querySelectorAll('.subtab[data-sub]').forEach(x=>x.classList.remove('on'));b.classList.add('on');['bowel','med','memo'].forEach(x=>document.getElementById('sub-'+x).style.display=x===s?'block':'none')}
+function pickStool(n,el){bristol=n;document.querySelectorAll('.stool').forEach(x=>x.classList.remove('on'));el.classList.add('on');document.getElementById('bristolBadge').textContent='評価：'+n}
+function pickCat(c,el){medCat=c;document.querySelectorAll('#medCats .subtab').forEach(x=>x.classList.remove('on'));el.classList.add('on')}
+function setBowel(v){bowelYes=v;yesBtn.classList.toggle('on',v);noBtn.classList.toggle('on',!v);bowelDetails.style.display=v?'block':'none'}
+function setMed(v){medYes=v;medYesEl=document.getElementById('medYes');medNoEl=document.getElementById('medNo');medYesEl.classList.toggle('on',v);medNoEl.classList.toggle('on',!v);medDetails.style.display=v?'block':'none'}
 
-    <section id="csv" class="view">
-      <div class="section-head"><div><span class="eyebrow">DATA PORT</span><h2>CSV管理</h2></div></div>
-      <div class="csv-grid">
-        <div class="panel"><h3>CSV出力</h3><p>Excel集計やバックアップ用にデータを書き出します。</p><button class="primary full" id="exportRecords">排便記録CSVを出力</button><button class="secondary full" id="exportUsers">利用者マスタCSVを出力</button><button class="secondary full" id="exportLaxatives">下剤記録CSVを出力</button></div>
-        <div class="panel"><h3>CSV取込</h3><p>同じ形式のCSVを読み込みます。重複IDは上書きします。</p><label class="dropzone"><input type="file" id="csvFile" accept=".csv"/><strong>CSVファイルを選択</strong><span>users / bowel_records / laxative_records に対応</span></label><div id="importResult" class="import-result"></div></div>
-      </div>
-      <div class="panel"><h3>CSV列仕様</h3><div class="schema"><code>利用者: user_id, name, kana, sex, birth_date, unit, diagnoses, bowel_notes, normal_interval, caution_days, warning_days, status</code><code>排便: record_id, user_id, date, time, bowel, amount, bristol, color, abdominal_pain, bloating, symptoms, care, memo, staff_id, created_at, updated_at</code><code>下剤: laxative_id, user_id, date, time, type, name, dose, reason, staff_id, memo</code></div></div>
-    </section>
-
-    <section id="settings" class="view">
-      <div class="section-head"><div><span class="eyebrow">SETTINGS</span><h2>表示・判定設定</h2></div></div>
-      <div class="panel settings-form">
-        <label>黄色（確認）になる排便なし日数 <input type="number" id="yellowDays" min="1" max="30" /></label>
-        <label>オレンジ（注意）になる排便なし日数 <input type="number" id="orangeDays" min="1" max="30" /></label>
-        <label>赤（要確認）になる排便なし日数 <input type="number" id="redDays" min="1" max="30" /></label>
-        <label>下剤後に注意表示する時間 <input type="number" id="laxHours" min="1" max="168" /></label>
-        <button class="primary" id="saveSettings">設定を保存</button>
-        <p class="note">施設の運用基準に合わせて変更してください。赤表示は医学的な診断を意味しません。</p>
-      </div>
-    </section>
-  </main>
-
-  <dialog id="recordDialog" class="modal"><form method="dialog" id="recordForm"><div class="modal-head"><div><span class="eyebrow">QUICK RECORD</span><h3>排便・ケア記録</h3></div><button value="cancel" class="icon-btn">×</button></div><div class="form-grid">
-    <label>利用者<select id="recordUser" required></select></label><label>日付<input id="recordDate" type="date" required></label><label>時刻<input id="recordTime" type="time" required></label><label>排便<select id="bowel"><option>あり</option><option>なし</option></select></label><label>量<select id="amount"><option value="">－</option><option>少</option><option>中</option><option>多</option></select></label><label>Bristol<select id="bristol"><option value="">－</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label><label>腹痛<select id="pain"><option>なし</option><option>あり</option></select></label><label>腹部膨満<select id="bloating"><option>なし</option><option>あり</option></select></label><label class="wide">ケア内容<input id="care" placeholder="浣腸・摘便など"></label><label class="wide">メモ<textarea id="memo" rows="3"></textarea></label></div><details class="laxative-box"><summary>下剤も記録する</summary><div class="form-grid"><label>種類<select id="laxType"><option>頓用</option><option>定期</option><option>その他</option></select></label><label>薬剤・処置名<input id="laxName"></label><label>使用量<input id="laxDose"></label><label>使用理由<input id="laxReason"></label></div></details><div class="modal-actions"><button value="cancel" class="ghost">キャンセル</button><button type="button" class="primary" id="saveRecord">保存</button></div></form></dialog>
-
-  <dialog id="userDialog" class="modal"><form method="dialog"><div class="modal-head"><div><span class="eyebrow">RESIDENT</span><h3>利用者登録</h3></div><button value="cancel" class="icon-btn">×</button></div><div class="form-grid"><label>利用者ID<input id="newUserId" required></label><label>氏名<input id="newUserName" required></label><label>フリガナ<input id="newUserKana"></label><label>所属<input id="newUserUnit" placeholder="2F・Aユニットなど"></label><label class="wide">病名・持病<input id="newUserDx" placeholder="複数は / で区切る"></label><label class="wide">排便上の注意事項<textarea id="newUserNotes"></textarea></label></div><div class="modal-actions"><button value="cancel" class="ghost">キャンセル</button><button type="button" class="primary" id="saveUser">登録</button></div></form></dialog>
-
-  <dialog id="helpDialog" class="modal"><div class="modal-head"><div><span class="eyebrow">HOW TO USE</span><h3>使い方</h3></div><button class="icon-btn" onclick="helpDialog.close()">×</button></div><div class="guide"><div><b>1</b><h4>利用者を登録</h4><p>「利用者」からID・氏名・病名・注意事項を登録します。</p></div><div><b>2</b><h4>毎日の記録</h4><p>右上の「記録する」から排便・便性状・症状・下剤を記録します。</p></div><div><b>3</b><h4>色で確認</h4><p>緑→黄→橙→赤の順に、排便なし日数や下剤後経過を確認できます。</p></div><div><b>4</b><h4>CSVで集計</h4><p>CSV管理から出力し、専用Excelや別端末へ取り込めます。</p></div></div><p class="note">試作版はブラウザ内に保存します。実在する利用者情報で本番運用する前に、認証・権限・監査ログ等のセキュリティ実装が必要です。</p></dialog>
-
-  <script src="app.js"></script>
+function renderAll(){
+  fillSelects(); renderHome(); renderMaster(); updateCsvCount();
+  document.getElementById('warnDays').value=state.settings.warnDays;
+  document.getElementById('medHours').value=state.settings.medHours;
+}
+function fillSelects(){
+  const opts=state.users.map(u=>`<option value="${u.id}">${u.name}（${u.group||'-'}）</option>`).join('');
+  const ids=['personSelect','calPerson','analysisPerson'];ids.forEach(id=>{let e=document.getElementById(id),v=e.value;e.innerHTML=opts;if([...e.options].some(o=>o.value===v))e.value=v});
+  let c=document.getElementById('csvPerson'),v=c.value;c.innerHTML='<option value="all">全利用者</option>'+opts;if([...c.options].some(o=>o.value===v))c.value=v;
+  const recToday=new Set(state.records.filter(r=>r.date===iso(today)).map(r=>r.userId));
+  document.getElementById('recordProgress').textContent=`本日 ${recToday.size}/${state.users.length}人 入力済み`;
+}
+function userName(id){return state.users.find(u=>u.id===id)?.name||id}
+function lastBowel(uid){return state.records.filter(r=>r.userId===uid&&r.bowel).sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time))[0]}
+function daysSince(date){if(!date)return 999;return Math.floor((new Date(iso(today))-new Date(date))/86400000)}
+function renderHome(){
+  const td=iso(today), todayUsers=new Set(state.records.filter(r=>r.date===td&&r.bowel).map(r=>r.userId));
+  sUsers.textContent=state.users.length;sToday.textContent=todayUsers.size;
+  const warnings=state.users.map(u=>({u,last:lastBowel(u.id)})).filter(x=>daysSince(x.last?.date)>=state.settings.warnDays);
+  sWarn.textContent=warnings.length;
+  const medLate=state.users.filter(u=>{let rs=state.records.filter(r=>r.userId===u.id&&r.med).sort((a,b)=>(b.date+b.medTime).localeCompare(a.date+a.medTime));if(!rs.length)return false;let m=rs[0],lb=lastBowel(u.id);let mt=new Date(m.date+'T'+(m.medTime||'00:00')),bt=lb?new Date(lb.date+'T'+(lb.time||'00:00')):null;return (!bt||bt<mt)&&((new Date()-mt)/36e5>=state.settings.medHours)});sMed.textContent=medLate.length;
+  alertList.innerHTML=warnings.slice(0,6).map(x=>`<div class="person"><div><strong>${x.u.name}</strong><div class="small muted">最終排便 ${x.last?x.last.date:'記録なし'}</div></div><span class="badge ${daysSince(x.last?.date)>=4?'danger':'warn'}">排便なし ${x.last?daysSince(x.last.date)+'日':'要確認'}</span></div>`).join('')||'<div class="muted">現在、設定基準に該当する方はいません。</div>';
+  const recSet=new Set(state.records.filter(r=>r.date===td).map(r=>r.userId));let un=state.users.filter(u=>!recSet.has(u.id));progText.textContent=`${recSet.size} / ${state.users.length}人`;progBar.style.width=(state.users.length?recSet.size/state.users.length*100:0)+'%';
+  unrecorded.innerHTML=un.slice(0,5).map(u=>`<div class="person"><strong>${u.name}</strong><button class="btn soft" onclick="selectAndRecord('${u.id}')">入力する</button></div>`).join('')||'<div class="badge ok">全員入力済みです ✓</div>';
+}
+function selectAndRecord(id){go('record');personSelect.value=id}
+function saveRecord(next){
+  const uid=personSelect.value;if(!uid)return;
+  const rec={id:'R'+Date.now(),userId:uid,date:iso(today),time:bowelTime.value||'00:00',bowel:bowelYes,bristol:bowelYes?bristol:null,amount:bowelYes?amount.value:'',care:bowelYes?care:'なし',med:medYes,medCat:medYes?medCat:'',medName:medYes?medName.value:'',medTime:medYes?document.getElementById('medTime').value:'',route:medYes?route.value:'',dose:medYes?dose.value:'',medReason:medYes?medReason.value:'',memo:memo.value};
+  state.records.push(rec);save();toast('記録を保存しました');
+  if(next){let i=state.users.findIndex(u=>u.id===uid);let ni=(i+1)%state.users.length;personSelect.value=state.users[ni].id;window.scrollTo({top:0,behavior:'smooth'})}else go('home');
+}
+function renderCalendar(){
+  monthLabel.textContent=`${currentMonth.getFullYear()}年${String(currentMonth.getMonth()+1).padStart(2,'0')}月`;
+  const first=new Date(currentMonth),start=new Date(first);start.setDate(1-first.getDay());
+  let html=['日','月','火','水','木','金','土'].map(x=>`<div class="cal-head">${x}</div>`).join('');
+  for(let i=0;i<42;i++){let d=new Date(start);d.setDate(start.getDate()+i);let ds=iso(d),other=d.getMonth()!==currentMonth.getMonth(),mode=calMode.value,rs=state.records.filter(r=>r.date===ds&&(mode==='all'||r.userId===calPerson.value));
+    let ev=rs.slice(0,4).map(r=>{let n=r.bowel?r.bristol:'-';let cls=r.bowel?'b'+r.bristol:'none';return `<div class="ev"><i class="dotnum ${cls}">${n}</i><span>${mode==='all'?userName(r.userId):r.time||''}${r.med?' 💊':''}</span></div>`}).join('');if(rs.length>4)ev+=`<div class="ev">＋${rs.length-4}件</div>`;
+    html+=`<div class="day ${other?'other':''} ${ds===iso(today)?'today':''}" onclick="showDay('${ds}')"><div class="date">${d.getDate()}</div>${ev}</div>`}
+  calendarGrid.innerHTML=html;
+}
+function moveMonth(n){currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+n,1);renderCalendar()}
+function showDay(ds){dayDetailTitle.textContent=ds+' の記録';let rs=state.records.filter(r=>r.date===ds);if(calMode.value==='single')rs=rs.filter(r=>r.userId===calPerson.value);dayDetail.innerHTML=rs.map(r=>`<div class="person"><div><strong>${userName(r.userId)}</strong><div class="small muted">${r.time||''} ${r.bowel?'排便あり / Bristol '+r.bristol+' / '+r.amount:'排便なし'}${r.med?' / 💊 '+(r.medName||r.medCat):''}</div></div><span class="dotnum ${r.bowel?'b'+r.bristol:'none'}">${r.bowel?r.bristol:'-'}</span></div>`).join('')||'<div class="muted">記録はありません。</div>'}
+function renderAnalysis(){
+  const uid=analysisPerson.value;if(!uid)return;const days=+analysisRange.value;let from=new Date(today);from.setDate(from.getDate()-days+1);let rs=state.records.filter(r=>r.userId===uid&&new Date(r.date)>=from&&r.bowel).sort((a,b)=>a.date.localeCompare(b.date));
+  let buckets=Array(6).fill(0);rs.forEach(r=>{let diff=Math.floor((new Date(r.date)-from)/86400000);buckets[Math.min(5,Math.floor(diff/(days/6)))]++});countChart.innerHTML=buckets.map((v,i)=>`<div class="bar" style="height:${Math.max(8,v*28)}px"><span>${i+1}</span></div>`).join('');
+  let dist=Array(7).fill(0);rs.forEach(r=>dist[r.bristol-1]++);bristolStats.innerHTML=dist.map((v,i)=>`<div class="small">Bristol ${i+1}：<b>${v}</b>回</div>`).join('');
+  let gaps=[];for(let i=1;i<rs.length;i++)gaps.push((new Date(rs[i].date)-new Date(rs[i-1].date))/86400000);let pts=gaps.map((g,i)=>`${40+i*(420/Math.max(1,gaps.length-1))},${170-Math.min(5,g)*28}`).join(' ');
+  intervalChart.innerHTML=`<line x1="35" y1="170" x2="470" y2="170" stroke="#dce7ef"/><polyline fill="none" stroke="#5fcbbc" stroke-width="4" points="${pts}"/>`+gaps.map((g,i)=>`<circle cx="${40+i*(420/Math.max(1,gaps.length-1))}" cy="${170-Math.min(5,g)*28}" r="5" fill="#74c8f4"/>`).join('');
+  let avg=rs.length? (rs.reduce((s,r)=>s+r.bristol,0)/rs.length).toFixed(1):'-',avgGap=gaps.length?(gaps.reduce((a,b)=>a+b,0)/gaps.length).toFixed(1):'-',medc=state.records.filter(r=>r.userId===uid&&new Date(r.date)>=from&&r.med).length;
+  trendText.innerHTML=`<div class="person"><span>期間内の排便回数</span><b>${rs.length}回</b></div><div class="person"><span>平均Bristol</span><b>${avg}</b></div><div class="person"><span>平均排便間隔</span><b>${avgGap}日</b></div><div class="person"><span>下剤等の使用</span><b>${medc}回</b></div>`;
+}
+function renderMaster(){userMaster.innerHTML=state.users.map(u=>`<div class="person"><div><strong>${u.name}</strong><div class="small muted">${u.id} / ${u.group||'-'}</div></div><button class="btn danger" onclick="removeUser('${u.id}')">削除</button></div>`).join('')}
+function addUser(){let id=newId.value.trim()||'U'+String(Date.now()).slice(-5),name=newName.value.trim();if(!name)return toast('氏名を入力してください');state.users.push({id,name,group:newGroup.value.trim()});newId.value=newName.value=newGroup.value='';save();toast('利用者を追加しました')}
+function removeUser(id){if(!confirm('利用者を削除しますか？記録は残ります。'))return;state.users=state.users.filter(u=>u.id!==id);save()}
+function saveSettings(){state.settings.warnDays=+warnDays.value||3;state.settings.medHours=+medHours.value||24;save();toast('設定を保存しました')}
+function setCsvPreset(){let p=csvPreset.value,from=new Date(today),to=new Date(today);if(p==='month'){from=new Date(today.getFullYear(),today.getMonth(),1);to=new Date(today.getFullYear(),today.getMonth()+1,0)}if(p==='prev'){from=new Date(today.getFullYear(),today.getMonth()-1,1);to=new Date(today.getFullYear(),today.getMonth(),0)}csvFrom.value=iso(from);csvTo.value=iso(to);updateCsvCount()}
+['csvFrom','csvTo','csvPerson','csvType'].forEach(id=>document.getElementById(id)?.addEventListener('change',updateCsvCount));
+function filteredRecords(){return state.records.filter(r=>r.date>=csvFrom.value&&r.date<=csvTo.value&&(csvPerson.value==='all'||r.userId===csvPerson.value))}
+function updateCsvCount(){if(!document.getElementById('csvCount'))return;csvCount.textContent=`現在の条件：${filteredRecords().length}件`}
+function csvEscape(v){v=v??'';v=String(v);return /[",\n]/.test(v)?'"'+v.replaceAll('"','""')+'"':v}
+function download(name,rows){let csv='\uFEFF'+rows.map(r=>r.map(csvEscape).join(',')).join('\n');let blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function exportCsv(){
+  let type=csvType.value,rs=filteredRecords(),rows=[];
+  if(type==='users'){rows=[['利用者ID','氏名','所属'],...state.users.map(u=>[u.id,u.name,u.group||''])];download('users.csv',rows);return}
+  if(type==='bowel'){rows=[['記録ID','利用者ID','氏名','記録日','時刻','排便有無','便状態1-7','量','ケア','メモ'],...rs.map(r=>[r.id,r.userId,userName(r.userId),r.date,r.time,r.bowel?'あり':'なし',r.bristol??'',r.amount||'',r.care||'',r.memo||''])]}
+  if(type==='med'){rows=[['記録ID','利用者ID','氏名','記録日','薬使用','カテゴリー','薬剤名','投与方法','投与量','投与時刻','投与理由'],...rs.filter(r=>r.med).map(r=>[r.id,r.userId,userName(r.userId),r.date,'あり',r.medCat||'',r.medName||'',r.route||'',r.dose||'',r.medTime||'',r.medReason||''])]}
+  if(type==='combined'){rows=[['記録ID','利用者ID','氏名','所属','記録日','時刻','排便有無','便状態1-7','量','ケア','薬使用','薬カテゴリー','薬剤名','投与方法','投与量','投与時刻','投与理由','メモ'],...rs.map(r=>{let u=state.users.find(u=>u.id===r.userId)||{};return[r.id,r.userId,u.name||'',u.group||'',r.date,r.time,r.bowel?'あり':'なし',r.bristol??'',r.amount||'',r.care||'',r.med?'あり':'なし',r.medCat||'',r.medName||'',r.route||'',r.dose||'',r.medTime||'',r.medReason||'',r.memo||'']})]}
+  download(`lunacare_${type}_${csvFrom.value}_${csvTo.value}.csv`,rows);toast('CSVを出力しました');
+}
+function importCsv(ev){
+  const f=ev.target.files[0];if(!f)return;let rd=new FileReader();rd.onload=()=>{let lines=rd.result.replace(/^\uFEFF/,'').split(/\r?\n/).filter(Boolean);if(lines.length<2)return toast('CSVを確認してください');let head=parseCsv(lines[0]);let added=0;for(let i=1;i<lines.length;i++){let v=parseCsv(lines[i]),o={};head.forEach((h,j)=>o[h]=v[j]);if(o['利用者ID']&&o['記録日']){state.records.push({id:o['記録ID']||'R'+Date.now()+i,userId:o['利用者ID'],date:o['記録日'],time:o['時刻']||'',bowel:o['排便有無']!=='なし',bristol:o['便状態1-7']?+o['便状態1-7']:null,amount:o['量']||'',care:o['ケア']||'',med:o['薬使用']==='あり',medCat:o['薬カテゴリー']||o['カテゴリー']||'',medName:o['薬剤名']||'',route:o['投与方法']||'',dose:o['投与量']||'',medTime:o['投与時刻']||'',medReason:o['投与理由']||'',memo:o['メモ']||''});added++}}
+  save();toast(`${added}件取り込みました`)};rd.readAsText(f,'UTF-8')
+}
+function parseCsv(s){let a=[],q=false,x='';for(let i=0;i<s.length;i++){let c=s[i];if(c=='"'){if(q&&s[i+1]=='"'){x+='"';i++}else q=!q}else if(c==','&&!q){a.push(x);x=''}else x+=c}a.push(x);return a}
+function openHelp(){helpModal.classList.add('on')}function closeHelp(){helpModal.classList.remove('on')}
+setup();
+</script>
 </body>
 </html>
